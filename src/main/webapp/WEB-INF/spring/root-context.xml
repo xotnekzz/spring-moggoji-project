@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+  <!-- Oracle Connection Pool, 안정적인 데이터베이스 연결 지원, MyBATIS 사용 -->
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+    <property name="url" value="jdbc:oracle:thin:@localhost:1521:XE" />
+    <property name="username" value="mv" />
+    <property name="password" value="1234" />
+  </bean>
+ 
+ <!-- typeAliasesPackage: MyBATIS에서 클래스 사용시 패키지 생략 가능,
+        mapperLocations: MyBATIS 설정 파일인 xml의 위치 등록 -->
+   <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource" />
+    <property name="typeAliasesPackage"
+      value="dev.mvc.actor,
+                            dev.mvc.admin,
+                            dev.mvc.director,
+                            dev.mvc.genre,
+                            dev.mvc.log,
+                            dev.mvc.member,
+                            dev.mvc.movie, 
+                            dev.mvc.movie.bucket, 
+                            dev.mvc.movie.comment, 
+                            dev.mvc.movie.comment.good,
+                            dev.mvc.review,
+                            dev.mvc.review.comment,
+                            dev.mvc.review.comment.good,
+                            dev.mvc.review.comment.reply.good,
+                            dev.mvc.review.comment.reply,
+                            dev.mvc.qna" />
+
+    <property name="mapperLocations" value="classpath:mybatis/*.xml" />
+  </bean> 
+   
+  <!-- Spring이 MyBATIS를 사용할 때 호출하는 객체 -->
+   <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+    <constructor-arg ref="sqlSessionFactory"/>
+  </bean>
+</beans>
+      

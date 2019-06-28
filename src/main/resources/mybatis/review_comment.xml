@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="rcomment">
+
+<!-- 댓글 등록 -->
+<insert id="create" parameterType="RcommentVO">
+  INSERT INTO rcomment(rcno, rcdate, content, reviewno, memberno, mname)
+  VALUES((SELECT NVL(MAX(rcno), 0)+1 as rcno FROM rcomment), 
+              sysdate, #{content}, #{reviewno}, #{memberno}, #{mname})
+</insert>
+
+<!-- 댓글 리스트 -->
+<select id="list" resultType="RcommentVO" parameterType="int">
+  SELECT rcno, rcdate, content, reviewno, memberno, mname
+  FROM rcomment
+  WHERE reviewno = #{reviewno}
+  ORDER BY rcno DESC
+</select>
+
+<!--  댓글 삭제  -->
+<select id="delete" parameterType="HashMap">
+ DELETE FROM rcomment
+ WHERE rcno=#{rcno} AND memberno=#{memberno}
+</select>
+
+<!-- 댓글 갯수 -->
+<select id="comment_count" resultType="int" parameterType="int">
+ SELECT count(*) as cnt
+ FROM rcomment
+ WHERE reviewno=#{reviewno}
+</select>
+
+<!-- 댓글 페이징 -->
+<select id="list_paging" resultType="RcommentVO" parameterType="HashMap">
+   SELECT  rcno, rcdate, content, reviewno, memberno, mname, r
+   FROM (
+            SELECT rcno, rcdate, content, reviewno, memberno, mname, rownum as r
+             FROM rcomment
+             WHERE reviewno = #{reviewno}
+             ORDER BY rcno DESC
+   )
+   WHERE <![CDATA[ r >= #{startNum} AND r <= #{endNum} ]]><!--  태그를 단순 문자열로 처리 -->
+</select>
+
+</mapper>

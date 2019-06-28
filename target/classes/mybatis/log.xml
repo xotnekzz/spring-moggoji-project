@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="log">
+
+<insert id="log_create" parameterType="LogVO">
+  INSERT INTO log(logno, memail, ip, uri, logdate)
+  VALUES(SELECT NVL(MAX(logno), 0)+1 AS logno FROM log), #{memail}, #{ip}, #{uri}, sysdate());
+</insert>
+
+</mapper>

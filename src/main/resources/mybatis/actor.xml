@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="actor">
+  <!-- 
+    insert: INSERT SQL 실행
+    id: Spring에서 호출시 사용
+    parameterType: 전달받는 데이터 객체
+    return: 등록한 레코드 갯수 리턴 
+    SQL 선언시 ';'(세미콜론) 삭제
+    #{} : '?' 동일
+    #{name} : public String getName() {..};  
+   -->
+  <insert id="create" parameterType="ActorVO">
+   INSERT INTO actor(actorno, actorNm, actorEnNm, acode)
+   VALUES((SELECT NVL(MAX(actorno), 0)+1 as actorno FROM actor), #{actorNm}, #{actorEnNm}, #{acode})
+  </insert> 
+    
+</mapper>

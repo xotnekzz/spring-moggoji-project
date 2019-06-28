@@ -1,0 +1,674 @@
+@CHARSET "UTF-8";
+
+*{
+font-family: 'Jeju Gothic', serif;
+}
+
+  .container{
+    width : 100%;
+    text-align: center;
+    margin-top: 50px;
+  }
+  .content {
+  width: 70%;
+  display: inline-block; 
+  /* z-index: 1; */
+  margin: 0px auto;
+  margin-top: 60px; /* 90 */
+  }
+  
+  /* 마이페이지, 관리자페이지에서만 */
+  .list_content {
+  width: 70%;
+  display: inline-block; 
+/*   z-index: 1; */
+  margin: 0px auto;
+  }
+  
+ .li_none {
+    list-style : none;        /* 블렛 기호 생략 */
+    margin : 10px 10px;   /* 위아래 좌우*/
+  }
+  
+  .li_center {
+    text-align : center;
+    list-style : none;
+    margin: 20px auto;
+  }
+ 
+  .li_right {
+    text-align : right;
+    list-style : none;
+    margin : 20px auto;
+  }
+  
+
+    
+  /*    index.jsp css      */
+  
+  /* 인덱스 장르*/
+  .index_genr{
+    width: 19%;
+    float: left;
+    margin: 5px;
+    position: relative;
+    height: 163px;
+  }
+  
+  .index_genr img{
+   width: 100%;
+   height: 100%;
+   border-radius: 4px;
+   transition: .3s;
+   padding-left: 0px;
+ }
+ 
+ .index_genr:hover img{
+  filter:blur(1px) brightness(70%);
+ }
+ 
+ .index_genr :not(img){
+  position: absolute;
+  /* top: 35%; */
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  opacity: 1;
+  z-index: 2;
+  text-shadow: 2px 3px #000000;
+}
+
+.index_genr a{
+  opacity: 1;
+  top: 0%; 
+  height: 160px; 
+  left: 0px;
+  float: left;
+}
+
+.index_genr h4{
+  top: 40%;
+}
+  /* 인덱스 장르 end*/
+
+
+  
+  
+  /*menu/top css*/
+
+.fixed-menu {
+  width: 100%;
+  background-color : #F3F3F3;
+  /* background-image : url("./images/main_top.jpg"); */
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 2;
+  float: left;
+  text-align: center;
+}
+
+
+/* @import url(https://fonts.googleapis.com/css?family=Raleway:400,500,800); */
+.menu1 {
+    font-family: 'Raleway', Arial, sans-serif;
+    /* text-transform: uppercase; */
+    float: left;
+    width: 30%;
+    font-size: 18px;
+    margin-top: 31px;
+    margin-left: -15px;
+}
+.menu1 * {
+  box-sizing: border-box;
+}
+
+.menu1 ul{
+  padding: 0px;
+}
+.menu1 li {
+  display: inline-block;
+  list-style: outside none none;
+  margin: 0 0.3em;
+  padding: 0;
+}
+.menu1 a {
+  padding: 0.63em 0;
+  color: rgba(0, 0, 0, 1);
+  position: relative;
+  letter-spacing: 1px;
+  text-decoration: none;
+}
+.menu1 a:before,
+.menu1 a:after {
+  position: absolute;
+  -webkit-transition: all 0.35s ease;
+  transition: all 0.35s ease;
+}
+.menu1 a:before {
+  bottom: 0;
+  display: block;
+  height: 3px;
+  width: 0%;
+  content: "";
+  background-color: #F47677;
+}
+.menu1 a:after {
+  left: 0;
+  top: 0;
+  padding: 0.5em 0;
+  position: absolute;
+  content: attr(data-hover);
+  color: #F47677;
+  white-space: nowrap;
+  max-width: 0%;
+  overflow: hidden;
+}
+.menu1 a:hover:before,
+.menu1 .current a:before {
+  opacity: 1;
+  width: 100%;
+}
+.menu1 a:hover:after,
+.menu1 .current a:after {
+  max-width: 100%;
+}
+   
+
+
+/* search*/
+
+.search{
+    width: 25%;
+    margin-top: 40px;
+    float: left;
+    padding: 0px; 
+    text-align: left;
+} 
+.search-form {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  width: 350px;
+  height: 40px;
+  border-radius: 40px;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  background: #fff;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+.search-form.focus {
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
+}
+
+.search-input {
+  position: absolute;
+  top: 10px;
+  left: 38px;
+  font-size: 14px;
+  background: none;
+  color: #5a6674;
+  width: 195px;
+  height: 20px;
+  border: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  outline: none;
+}
+.search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+          appearance: none;
+}
+
+.search-button {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  height: 20px;
+  width: 20px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  outline: none !important;
+  cursor: pointer;
+}
+.search-button svg {
+  width: 20px;
+  height: 20px;
+  fill: #5a6674;
+}
+
+.search-option {
+  position: absolute;
+  text-align: right;
+  top: 10px;
+  right: 15px;
+}
+.search-option div {
+  position: relative;
+  display: inline-block;
+  margin: 0 1px;
+  cursor: pointer;
+}
+.search-option div input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.01;
+  cursor: pointer;
+}
+.search-option div span {
+  position: absolute;
+  display: block;
+  text-align: center;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  opacity: 1; 
+  background: #929AA3;
+  color: #fff;
+  font-size: 9px;
+  letter-spacing: 1px;
+  line-height: 1;
+  text-transform: uppercase;
+  padding: 4px 7px;
+  border-radius: 12px;
+  top: -18px;
+  -webkit-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+}
+.search-option div span::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  opacity: 1;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  border-top: 4px solid #929AA3;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  -webkit-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+}
+.search-option div:hover span {
+  opacity: 1;
+  top: -21px;
+}
+.search-option div label {
+  display: block;
+  cursor: pointer;
+}
+.search-option div svg {
+  height: 20px;
+  width: 20px;
+  fill: #5a6674;
+  opacity: 0.6;
+  -webkit-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+  pointer-events: none;
+}
+.search-option div:hover svg {
+  opacity: 1;
+}
+.search-option div input:checked + label svg {
+  fill: #e24040;
+  opacity: .9;
+}
+.search-option div input:checked + label span {
+  background: #e24040;
+}
+.search-option div input:checked + label span::after {
+  border-top-color: #e24040;
+}
+
+.login{
+    width: 6%;
+    margin-top: 22px;
+    font-size: 15px;
+    float: left;
+    padding: 0px;
+}
+
+
+/* search*/
+.search__title {
+        font-size: 22px;
+        font-weight: 900;
+        text-align: center;
+        color: #F47677;
+    }
+
+.search__input {
+        width: 100%;
+        padding: 10px 24px;
+        background-color: transparent;
+        transition: transform 250ms ease-in-out;
+        font-size: 14px;
+        line-height: 18px;
+        color: #F47677;
+        background-color: transparent;
+        background-image: url(http://mihaeltomic.com/codepen/input-search/ic_search_black_24px.svg);
+        background-repeat: no-repeat;
+        background-size: 18px 18px;
+        background-position: 95% center;
+        border-radius: 50px;
+        border: 1px solid rgba(0, 0, 0, 0.5);
+        transition: all 250ms ease-in-out;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+    }
+
+.search__input::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+.search__input:hover,
+        .search__input:focus {
+            padding: 10px 0;
+            outline: 0;
+            border: 1px solid transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+            border-radius: 0;
+            background-position: 100% center;
+        }
+  
+
+
+/* favorite.jsp */
+ .underline{
+  border-left-width:0; 
+  border-right-width:0; 
+  border-top-width:0; 
+  border-bottom-width:1; 
+  border:0;
+  border-bottom: 2px solid #dddddd;
+ }
+
+
+/* 네비바 */
+#topheader .navbar-nav .nav-item > a {
+  text-transform: capitalize;
+  color: #000;
+  transition: background-color .2s, color .2s; 
+}
+
+#topheader .navbar-nav li > a:hover, 
+#topheader .navbar-nav li > a:focus {
+    background-color: #333;
+    color: #fff;
+}
+
+#topheader .navbar-nav li.active > a,
+#topheader .navbar-nav li.active > a:hover, 
+#topheader .navbar-nav li.active > a:focus {
+  background-color: #333;
+  color: #fff;
+}
+/* 네비바 end */
+
+
+/*메인 영화 장르 검색*/
+
+/* Dropdown button on hover & focus */
+.dropbtn:hover, .dropbtn:focus {
+    background-color: #3e8e41;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
+
+/*메인 영화 장르 검색 end */
+
+
+/* 영화 포스터  */
+/* div 크기 */
+.main_movie{
+  width: 24%;
+  height: 370px;
+  display: inline-block; /* 옆으로 차곡차곡 */
+  margin: 5px;
+  position: relative;
+  float: left; 
+  left: 0%;
+
+}
+
+ /* 이미지 */
+.main_movie img{
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  transition: .3s;
+  padding-left: 0px;
+}
+
+/* 이미지 위에 마우스를 올렸다 */
+.main_movie:hover img{
+  filter:blur(1px) brightness(40%);
+}
+
+.main_movie :not(img){
+  position: absolute;
+  top: 60%;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  opacity: 0;
+  transition: .3s;
+}
+
+.main_movie h5{
+  top:80%;
+  /* color: #000000; */
+}
+
+.main_movie:hover :not(img){
+  opacity: 1;
+}
+
+.main_movie a{
+  opacity: 1;
+  top:0%; 
+  height: 370px; 
+  left: 0px;
+}
+/* 영화 포스터 end */
+
+
+ /* 박스오피스 */
+ .bocoffice_rank{
+  width: 24%;
+  float: left; 
+  /* background-color: #e6e6e6; */
+  border: 1px solid #b1b1b1;
+  text-align: left;
+  margin: 5px;
+  border-radius: 4px;
+  height: 354px;
+ }
+ 
+ .span_rank{
+/*   display: block;
+  float:left; */
+  border: 1px solid #b0b0b0;
+  padding: 3px;
+  font-size: 15px; 
+  width: 26px;
+  
+ }
+ 
+ .boxoffice_total{
+  float: right; 
+  width: 75%;
+ }
+ 
+.boxoffice_out{
+  width: 98%;
+  float: left; 
+  border: 1px solid #b1b1b1; 
+  border-radius: 4px; 
+  height: 326px; 
+  margin: 5px;
+  margin-left: 10px;
+}
+
+.boxoffice{
+  float: left; 
+  width: 67%; 
+  height: 310px; 
+  border-radius: 4px;
+  margin-top: 3px;
+  margin-left: 10px;
+  text-align: left;
+}
+
+ .span_font{
+  color: #aaaaaa;
+ }
+/* 박스오피스 end */
+
+
+
+/* 메인메뉴 리뷰 */
+ .div_grid_review{
+  float: left; 
+  width: 24%; 
+  height: 370px; 
+  position: relative; 
+  display: inline-block; 
+  margin: 5px; 
+  border: 1px solid #b1b1b1;
+  border-radius: 4px;
+  text-align: center;
+ } 
+ /* 메인메뉴 리뷰 end */
+ 
+ 
+
+ /* 회원 마이페이지 코멘트 */
+.comment_out{
+  width: 49%;
+  border: 1px solid #b1b1b1; 
+  border-radius: 4px; 
+  height: 350px; 
+  float: left; 
+  margin: 5px;
+}
+
+.comment{
+  float: left; 
+  width: 48%; 
+  height: 335px; 
+  /* border: 1px solid #cccccc;  */
+  border-radius: 4px;
+  margin-top: 3px;
+  margin-left: 4px;
+}
+/* 회원 마이페이지 코멘트 end */
+ 
+ 
+ /* 팝업 윈도우 */
+ /* 마이페이지 영화 코멘트 수정*/
+  .popup_modify {
+    line-height: 30px; 
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 5px;
+    position: absolute;
+    top: 25%;
+    left: 30%;
+    width: 45%;
+    height: 265px;
+    background-color: #ffffff;
+    opacity: 1;
+    text-align: center;
+    color: #000000;
+    border: 1px solid #cccccc; 
+     z-index: 2;
+  }
+  
+ /* 마이페이지 영화 코멘트 삭제*/
+  .popup_delete {
+    line-height: 30px; 
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 5px;
+    position: absolute;
+    top: 25%;
+    left: 40%;
+    width: 25%;
+    height: 135px;
+    background-color: #ffffff;
+    opacity: 1;
+    text-align: center;
+    color: #000000;
+    border: 1px solid #cccccc; 
+    z-index: 3;
+    
+  }
+  
+  /* 영화 코멘트 수정, 삭제 버튼 */
+    .popup_button{
+    color: #333333;
+    background-color: #ffffff; 
+    border: solid 1px #aaaaaa; 
+    border-radius: 4px; 
+    padding: 1px 6px;
+    
+    }
+    
+    /* 영화 상세 */
+   .popup_movie {
+    line-height: 20px;  /* 글씨 높이 간격  */
+    margin-top: 0px;
+    margin-bottom: 10px;
+    padding: 5px;
+    position: absolute;
+    top: 10%;
+    left: 15%;
+    width: 70%;
+    min-height: 1000px;
+    height: auto;
+    background-color: #ffffff;
+    opacity: 1;
+    text-align: left;
+    color: #000000;
+    border: 2px solid #cccccc; 
+    z-index: 3;
+    border-radius: 4px;
+  }
+  

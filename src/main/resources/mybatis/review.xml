@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="review">
+<!-- 
+  SELECT sql 중 조회용으로 사용
+  resultMap: DBMS 컬럼명과 VO의 변수명이 다른경우
+  id="CodeVOResultMap": 식별이 잘되는 이름 지정
+  property="": VO 클래스 변수명
+  column="": DBMS 컬럼명
+  javaType="": property 타입, java.lang 패키지에 명시된 타입
+  jdbcType="": 자바에서 대응하는 광범위한 오라클 타입 
+  
+  SELECT reviewno, title, content, rdate, youtube, mainimg, imgsize, cnt, visible, review_rating
+  FROM review
+  WHERE reviewno = 1;
+   -->
+
+<resultMap type="ReviewVO" id="ReviewVOResultMap">
+  <result property="reviewno" column="reviewno" javaType="java.lang.Integer" jdbcType="INTEGER" />
+  <result property="title" column="title" javaType="java.lang.String" jdbcType="VARCHAR" />
+  <result property="content" column="content" javaType="java.lang.String" jdbcType="CLOB" />
+  <result property="rdate" column="rdate" javaType="java.lang.String" jdbcType="DATE" />
+  <result property="mainimg" column="mainimg" javaType="java.lang.String" jdbcType="VARCHAR" />
+  <result property="imgsize" column="imgsize" javaType="java.lang.Integer" jdbcType="INTEGER" />
+  <result property="cnt" column="cnt" javaType="java.lang.Integer" jdbcType="INTEGER" />
+  <result property="visible" column="visible" javaType="java.lang.Character" jdbcType="CHAR" />
+  <result property="review_rating" column="review_rating" javaType="java.lang.Integer" jdbcType="INTEGER" />
+  <result property="memberno" column="memberno" javaType="java.lang.Integer" jdbcType="INTEGER" />
+  <result property="mname" column="mname" javaType="java.lang.String" jdbcType="VARCHAR" />
+</resultMap>
+
+
+ <!-- 리뷰 등록 -->
+  <insert id="create" parameterType="ReviewVO">
+    INSERT INTO review(reviewno, title, content, rdate, mainimg, imgsize, youtube, cnt, visible, memberno, mname)
+    VALUES((SELECT NVL(MAX(reviewno), 0)+1 as reviewno FROM review), 
+                #{title}, #{content:VARCHAR}, sysdate, #{mainimg}, #{imgsize}, #{youtube}, 0 , #{visible}, #{memberno}, #{mname})
+  </insert> 
+   
+   <!-- 리뷰 리스트 -->
+  <select id="list" resultType="ReviewVO">
+    SELECT reviewno, title, content, rdate, mainimg, imgsize, youtube, cnt, visible, review_rating, memberno
+    FROM review 
+    ORDER BY reviewno desc
+  </select>
+  
+  <!-- 리뷰 한건 조회 -->
+  <select id="read" resultMap="ReviewVOResultMap" parameterType="int">
+    SELECT reviewno, title, content, rdate, mainimg, imgsize, youtube, cnt, visible, review_rating, memberno
+    FROM review
+    WHERE reviewno = #{reviewno}
+  </select> 
+  
+  <!-- 조회수 증가 -->
+  <update id="cnt_increase" parameterType="ReviewVO">
+    UPDATE review
+    SET cnt = nvl(#{cnt}, 0) + 1
+    WHERE reviewno = #{reviewno} 
+  </update>
+  
+  <!-- 리뷰 수정 -->
+  <update id="update" parameterType="ReviewVO"> 
+    UPDATE review
+    SET title=#{title}, content=#{content:VARCHAR}, youtube=#{youtube}, mainimg=#{mainimg}, imgsize=#{imgsize}, visible=#{visible}
+    WHERE reviewno = #{reviewno} 
+  </update>
+  
+  <!-- 리뷰 삭제 -->
+  <delete id="delete" parameterType="int">
+    DELETE FROM review
+    WHERE reviewno = #{reviewno}
+  </delete>  
+  
+  <!-- 검색 갯수(메인메뉴) -->
+  <select id="search_count" resultType="int" parameterType="HashMap">
+    SELECT COUNT(*) as cnt
+    FROM review
+    <choose>
+      <when test="word == null or word == ''"> <!-- 검색하지 않는 경우 -->
+      
+      </when>
+      <otherwise>
+        WHERE title LIKE '%' || #{word} || '%'
+      </otherwise>
+    </choose>
+  </select>
+  
+  <!-- 리스트 + 검색(리뷰제목) + 페이징(메인메뉴) -->
+  <select id="all_list_search" resultType="ReviewVO" parameterType="HashMap">
+    SELECT reviewno, title, content, rdate, mainimg, imgsize, youtube, cnt, visible, review_rating, memberno, mname, r
+    FROM (
+              SELECT reviewno, title, content, rdate, mainimg, imgsize, youtube, cnt, visible, review_rating, memberno, mname, rownum as r
+              FROM (
+                        SELECT reviewno, title, content, rdate, mainimg, imgsize, youtube, cnt, visible, review_rating, memberno, mname
+                         FROM review
+                        <choose>
+                          <when test="word == null or word == ''"> <!-- 검색하지 않는 경우 -->
+                            WHERE visible = 'Y'
+                            ORDER BY reviewno DESC
+                          </when>
+                          <otherwise>
+                            WHERE  title LIKE '%' || #{word} || '%'  AND visible = 'Y'
+                            ORDER BY reviewno DESC
+                          </otherwise>
+                        </choose>
+            )
+    )
+    WHERE <![CDATA[ r >= #{startNum} AND r <= #{endNum} ]]><!--  태그를 단순 문자열로 처리 -->
+    <!-- WHERE r >= #{startNum} AND r <= #{endNum} -->
+  </select> 
+  
+    <!-- 검색 갯수(회원) -->
+  <select id="msearch_count" resultType="int" parameterType="HashMap">
+    SELECT COUNT(*) as cnt
+    FROM review
+    <choose>
+      <when test="word == null or word == ''"> <!-- 검색하지 않는 경우 -->
+       WHERE memberno = #{memberno}
+      </when>
+      <otherwise>
+        WHERE title LIKE '%' || #{word} || '%' AND memberno = #{memberno}
+      </otherwise>
+    </choose>
+  </select>
+  
+  <!-- 리스트 + 검색(리뷰제목) + 페이징(회원) -->
+  <select id="m_list_search" resultType="ReviewVO" parameterType="HashMap">
+    SELECT reviewno, title, content, rdate, mainimg, imgsize, youtube, cnt, visible, review_rating, memberno, r
+    FROM (
+              SELECT reviewno, title, content, rdate, mainimg, imgsize, youtube, cnt, visible, review_rating, memberno, rownum as r
+              FROM (
+                        SELECT reviewno, title, content, rdate, mainimg, imgsize, youtube, cnt, visible, review_rating, memberno
+                         FROM review
+                        <choose>
+                          <when test="word == null or word == ''"> <!-- 검색하지 않는 경우 -->
+                            WHERE memberno = #{memberno}
+                          </when>
+                          <otherwise>
+                            WHERE memberno = #{memberno}  AND title LIKE '%' || #{word} || '%'  
+                          </otherwise>
+                        </choose>
+                        ORDER BY reviewno DESC
+            )
+    )
+    WHERE <![CDATA[ r >= #{startNum} AND r <= #{endNum} ]]><!--  태그를 단순 문자열로 처리 -->
+    <!-- WHERE r >= #{startNum} AND r <= #{endNum} -->
+  </select> 
+  
+<!--   <resultMap type="MnameVO" id="mnameVO">
+    <result  property="mname" column="mname"/>
+    <result  property="memail" column="memail"/>
+    <result  property="memberno" column="memberno"/>
+    <result  property="reviewno" column="reviewno"/>
+  </resultMap> -->
+  
+  <!-- 리뷰를 쓴 회원 이름 -->
+  <select id="mname" resultType="MnameVO" parameterType="int">
+    SELECT mname, memail
+    FROM member
+    WHERE memberno = (SELECT memberno FROM review WHERE reviewno = #{reviewno})
+  </select>
+  
+  <!-- 리뷰별 댓글 갯수 -->
+  <select id="rcc" resultType="int" parameterType="int">
+    SELECT count(*) as cnt
+    FROM rcomment
+    WHERE reviewno=(select reviewno from review where reviewno = #{reviewno})
+  </select>
+  
+  </mapper>  

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="member">
+
+  <!-- 회원 등록 -->
+  <insert id="create" parameterType="MemberVO">
+       INSERT INTO member
+           ( memberno, 
+               memail, mname, mpasswd, mfile, msize, mact, mdate )
+       VALUES ( (select nvl(max(memberno),0) +1 as memberno from member),  
+            #{memail}, #{mname}, #{mpasswd}, #{mfile}, #{msize}, 'Y', SYSDATE)
+  </insert>
+    
+    <!-- 아이디 체크  -->
+  <select id="checkId" resultType="int" parameterType="String">
+        SELECT COUNT(memail) as cnt
+        FROM member
+        WHERE memail=#{memail}
+  </select>
+  
+  <!-- 회원 목록 출력 -->
+  <select id="list" resultType="MemberVO">
+    SELECT memberno, memail, mname, mfile, mact, mdate
+    FROM member
+    ORDER BY memberno ASC
+  </select>
+  
+ <!--    회원 목록 중 1건 조회 -->
+    <select id="read" resultType="MemberVO" parameterType="int">
+    SELECT memberno, memail, mname, mpasswd, mfile, msize, mact
+    FROM member
+    WHERE memberno = #{memberno}
+  </select>
+  
+  
+  <!-- email로 회원 목록 중 1건 조회 -->
+  <select id="read2" resultType="MemberVO" parameterType="String">
+    SELECT memberno, memail, mname, mpasswd, mfile, msize, mact
+    FROM member
+    WHERE memail = #{memail}
+  </select>
+  
+  <!-- login 처리-->
+  <select id="login" resultType="String" parameterType="String">
+    SELECT mpasswd
+    FROM member 
+    WHERE memail=#{memail}
+  </select>
+  
+  <!-- 회원 정보 수정 -->
+  <update id="update" parameterType="MemberVO">
+  UPDATE member
+  SET mname=#{mname}, mpasswd=#{mpasswd}, mfile=#{mfile}, msize=#{msize}
+  WHERE memberno=#{memberno}
+  </update>
+  
+  <!-- 회원 정보 삭제 -->
+  <delete id="delete" parameterType="int">
+  DELETE FROM member
+  WHERE memberno=#{memberno}
+  </delete>
+  
+  <!-- 회원 권한 수정 -->
+  <update id="act" parameterType="MemberVO">
+  UPDATE member
+  SET mact=#{mact}
+  WHERE memberno=#{memberno}
+  </update>
+  
+  <!-- 회원이름별 검색 목록 -->
+  <select id="member_list_search" resultType="MemberVO" parameterType="HashMap">
+    SELECT memberno, memail, mname, mfile, mact, mdate, r
+    FROM (
+          SELECT memberno, memail, mname, mfile, mact, mdate, rownum as r
+          FROM (
+                  SELECT memberno, memail, mname, mfile, mact, mdate
+                   FROM member
+                    <choose>
+                      <when test="col == 'memberno'">
+                      WHERE memberno LIKE '%' || #{word} || '%'
+                      ORDER BY memberno ASC
+                      </when>
+                      <when test="col == 'mname'">
+                      WHERE mname LIKE '%' || #{word} || '%'  
+                      ORDER BY memberno ASC
+                      </when>
+                      <when test="col == 'memail'">
+                      WHERE memail LIKE '%' || #{word} || '%'
+                      ORDER BY memberno ASC
+                      </when>
+                      <when test="col == 'mact'">
+                      WHERE mact LIKE '%' || #{word} || '%'
+                      ORDER BY memberno ASC
+                      </when>
+                      <otherwise>
+                        ORDER BY memberno ASC
+                      </otherwise>
+                    </choose>
+            )
+    )
+    WHERE <![CDATA[ r >= #{startNum} AND r <= #{endNum} ]]>
+  </select> 
+  
+  <!-- 회원 검색 갯수 -->
+   <select id="search_count" resultType="int" parameterType="HashMap">
+    SELECT COUNT(*) as cnt
+    FROM member
+     <choose>
+       <when test="col == 'memberno'">
+         WHERE memberno LIKE '%' || #{word} || '%'
+         ORDER BY memberno ASC
+       </when>
+       <when test="col == 'mname'">
+          WHERE mname LIKE '%' || #{word} || '%'  
+          ORDER BY memberno ASC
+       </when>
+       <when test="col == 'memail'">
+          WHERE memail LIKE '%' || #{word} || '%'
+          ORDER BY memberno ASC
+       </when>
+       <when test="col == 'mact'">
+          WHERE mact LIKE '%' || #{word} || '%'
+          ORDER BY memberno ASC
+       </when>
+       <otherwise>
+          ORDER BY memberno ASC
+       </otherwise>
+      </choose>
+  </select> 
+</mapper> 

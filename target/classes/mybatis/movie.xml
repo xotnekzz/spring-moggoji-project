@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="movie">
+  <!-- 
+    insert: INSERT SQL 실행
+    id: Spring에서 호출시 사용
+    parameterType: 전달받는 데이터 객체
+    return: 등록한 레코드 갯수 리턴 
+    SQL 선언시 ';'(세미콜론) 삭제
+    #{} : '?' 동일
+    #{name} : public String getName() {..};  
+   -->
+   <!-- open api 영화등록 -->
+   <insert id="create" parameterType="MovieVO">
+   INSERT INTO movie(movieno, movieCd, movieNm, movieNmEn, prdtYear, openDt, repNationNm, genre, director) 
+   VALUES ((SELECT NVL(MAX(movieno),0) +1 as movieno FROM movie), #{movieCd}, #{movieNm}, 
+                #{movieNmEn}, #{prdtYear}, #{openDt}, #{repNationNm}, #{genre}, #{director} ) 
+   </insert>
+   
+  <!-- open api 영화추가정보 수정 -->
+   <update id="update" parameterType="MovieVO">
+    UPDATE movie
+    SET showTm= #{showTm} , watchGradeNm= #{watchGradeNm}, actors = #{actors}
+    WHERE movieCd = #{movieCd} 
+   </update>   
+   
+  <!-- 영화 코드 목록 -->
+  <select id="list" resultType="MovieVO" >
+    select movieCd
+    from movie
+    where movieno BETWEEN 52001 AND 64958
+  </select>
+  
+  
+  <!-- 관리자 영화 목록 -->
+  <select id="a_movielist" resultType="MovieVO">
+    SELECT movieCd, movieno, movieNm, movieNmEn, prdtYear, openDt, repNationNm,
+              plot, showTm, watchGradeNm, genre, director, actors,
+              keyword, movieImg, thumb, imgSize, vodclass
+    FROM movie
+   <!--  ORDER BY movieno ASC -->
+    WHERE movieno BETWEEN 1 AND 10
+  </select>
+  
+  <!-- 관리자 영화 조회 -->
+  <select id="a_movieread" resultType="MovieVO" parameterType="String">
+    SELECT movieCd, movieno, movieNm, movieNmEn, prdtYear, openDt, repNationNm, 
+              plot, showTm, watchGradeNm, genre, director, actors,
+              keyword, movieImg, thumb, imgSize, vodclass
+    FROM movie
+    WHERE movieCd = #{movieCd}
+  </select>
+  
+  <!-- 관리자 영화 수정 -->
+  <update id="a_movieupdate"  parameterType="MovieVO">
+    UPDATE movie
+    SET plot=#{plot}, keyword=#{keyword}, movieImg=#{movieImg}, imgSize=#{imgSize}, thumb=#{thumb}, vodclass=#{vodclass}
+    WHERE movieCd = #{movieCd}
+  </update>
+  
+  <!-- 관리자 검색 갯수 -->
+  <select id="asearch_count" resultType="int" parameterType="HashMap">
+    SELECT COUNT(*) as cnt
+    FROM movie
+    <choose>
+      <when test="word == null or word == ''"> <!-- 검색하지 않는 경우 -->
+      </when>
+      <otherwise>
+        WHERE movieNm LIKE '%' || #{word} || '%'
+      </otherwise>
+    </choose>
+  </select>
+  
+  <!-- 관리자) 목록 + 검색(영화제목) + 페이징 -->
+  <select id="a_list_search" resultType="MovieVO" parameterType="HashMap">
+    SELECT movieCd, movieno, movieNm, movieNmEn, prdtYear, openDt, 
+              repNationNm, plot, showTm, watchGradeNm, genre, director, actors,
+              keyword, movieImg, thumb, imgSize, vodclass, r
+    FROM (
+              SELECT movieCd, movieno, movieNm, movieNmEn, prdtYear, openDt, 
+                        repNationNm, plot, showTm, watchGradeNm, genre, director, actors,
+                        keyword, movieImg, thumb, imgSize, vodclass, rownum as r
+              FROM (
+                        SELECT movieCd, movieno, movieNm, movieNmEn, prdtYear, openDt, 
+                                  repNationNm, plot, showTm, watchGradeNm, genre, director, actors,
+                                  keyword, movieImg, thumb, imgSize, vodclass
+                        FROM movie
+                        <choose>
+                          <when test="word == null or word == ''"> <!-- 검색하지 않는 경우 -->
+                            ORDER BY movieno ASC
+                          </when>
+                          <otherwise>
+                            WHERE  movieNm LIKE '%' || #{word} || '%'  
+                            ORDER BY movieno ASC
+                          </otherwise>
+                        </choose>
+            )
+    )
+    WHERE <![CDATA[ r >= #{startNum} AND r <= #{endNum} ]]><!--  태그를 단순 문자열로 처리 -->
+    <!-- WHERE r >= #{startNum} AND r <= #{endNum} -->
+  </select> 
+   
+ <!-- 메인메뉴 검색 갯수 -->
+  <select id="search_count" resultType="int" parameterType="HashMap">
+    SELECT COUNT(*) as cnt
+    FROM movie
+    <choose>
+      <when test="col == 'actors'">
+        WHERE actors LIKE '%' || #{word} || '%'
+      </when>
+      <when test="col == 'director'">
+        WHERE director LIKE '%' || #{word} || '%'
+      </when>
+      <when test="col == 'movieNm'">
+        WHERE movieNm LIKE '%' || #{word} || '%'
+      </when>
+      <when test="col == null or col == ''">
+        WHERE movieNm LIKE '%' || #{word} || '%'
+      </when>
+      <otherwise>
+      </otherwise>
+     </choose>
+  </select>
+  
+   <!--  메인메뉴)목록 + 검색(영화제목) + 페이징 -->
+  <select id="main_movie" resultType="MovieVO" parameterType="HashMap">
+    SELECT movieCd, movieno, movieNm, movieNmEn, prdtYear, openDt, 
+              repNationNm, plot, showTm, watchGradeNm, genre, director, actors,
+              keyword, movieImg, thumb, imgSize, vodclass, r
+    FROM (
+              SELECT movieCd, movieno, movieNm, movieNmEn, prdtYear, openDt, 
+                        repNationNm, plot, showTm, watchGradeNm, genre, director, actors,
+                        keyword, movieImg, thumb, imgSize, vodclass, rownum as r
+              FROM (
+                        SELECT movieCd, movieno, movieNm, movieNmEn, prdtYear, openDt, 
+                                  repNationNm, plot, showTm, watchGradeNm, genre, director, actors,
+                                  keyword, movieImg, thumb, imgSize, vodclass
+                        FROM movie
+                        <choose>
+                          <when test="col == 'actors'">
+                            WHERE actors LIKE '%' || #{word} || '%'
+                            ORDER BY movieno ASC
+                          </when>
+                          <when test="col == 'director'">
+                            WHERE director LIKE '%' || #{word} || '%'
+                            ORDER BY movieno ASC
+                          </when>
+                          <when test="col == 'movieNm'">
+                            WHERE movieNm LIKE '%' || #{word} || '%'
+                            ORDER BY movieno ASC
+                          </when>
+                          <when test="col == null or col == ''">
+                            WHERE movieNm LIKE '%' || #{word} || '%'
+                            ORDER BY movieno ASC
+                          </when>
+                          <otherwise>
+                            ORDER BY movieno ASC
+                          </otherwise>
+                        </choose>
+            )
+    )
+    WHERE <![CDATA[ r >= #{startNum} AND r <= #{endNum} ]]><!--  태그를 단순 문자열로 처리 -->
+    <!-- WHERE r >= #{startNum} AND r <= #{endNum} -->
+  </select> 
+  
+   <!-- 장르 별 갯수 -->
+  <select id="search_count_genre" resultType="int" parameterType="HashMap">
+    SELECT COUNT(*)
+    FROM movie
+    <choose>
+      <when test="genre == null or genre == ''"> <!-- 검색하지 않는 경우 -->
+      </when>
+      <otherwise>
+        WHERE genre LIKE '%' || #{genre} || '%'
+      </otherwise>
+    </choose>
+  </select>
+  
+  <!-- 장르) 목록 + 검색(영화장르) + 페이징 -->
+  <select id="list_search_genre" resultType="MovieVO" parameterType="HashMap">
+    SELECT movieCd, movieno, movieNm, movieNmEn, prdtYear, openDt, 
+              repNationNm, plot, showTm, watchGradeNm, genre, director, actors,
+              keyword, movieImg, thumb, imgSize, vodclass, r
+    FROM (
+              SELECT movieCd, movieno, movieNm, movieNmEn, prdtYear, openDt, 
+                        repNationNm, plot, showTm, watchGradeNm, genre, director, actors,
+                        keyword, movieImg, thumb, imgSize, vodclass, rownum as r
+              FROM (
+                        SELECT movieCd, movieno, movieNm, movieNmEn, prdtYear, openDt, 
+                                  repNationNm, plot, showTm, watchGradeNm, genre, director, actors,
+                                  keyword, movieImg, thumb, imgSize, vodclass
+                        FROM movie
+                        <choose>
+                          <when test="genre == null or genre == ''"> <!-- 검색하지 않는 경우 -->
+                            ORDER BY movieno ASC
+                          </when>
+                          <otherwise>
+                            WHERE  genre LIKE '%' || #{genre} || '%'  
+                            ORDER BY movieno ASC
+                          </otherwise>
+                        </choose>
+            )
+    )
+    WHERE <![CDATA[ r >= #{startNum} AND r <= #{endNum} ]]><!--  태그를 단순 문자열로 처리 -->
+    <!-- WHERE r >= #{startNum} AND r <= #{endNum} -->
+  </select> 
+  
+  <!--  영화별 댓글 갯수 -->
+  <select id="mcc" resultType="int" parameterType="String">
+    SELECT count(*) as cnt
+    FROM mcomment
+    WHERE movieCd = (SELECT movieCd FROM movie where movieCd =#{movieCd})
+  </select>
+  
+  <!-- boxOffice list -->
+  <select id="boxOffice_List" resultType="BoxOfficeVO">
+    SELECT rank, movieCd, movieNm, openDt, audiAcc
+    FROM boxOffice
+    ORDER BY rank ASC
+  </select>
+  
+  <!-- boxOffice read -->
+  <select id="boxOffice_Read" resultType="BoxOfficeVO" parameterType="int">
+    SELECT rank, movieCd, movieNm, openDt, audiAcc
+    FROM boxOffice
+    WHERE rank = #{rank}
+  </select>
+  
+  <!-- boxOffice update -->
+  <update id="boxOffice_update" parameterType="BoxOfficeVO">
+    UPDATE boxOffice
+    SET movieCd=#{movieCd}, movieNm=#{movieNm}, openDt=#{openDt}, audiAcc=#{audiAcc}
+    WHERE rank=#{rank}
+  </update>
+  
+  <!-- 메인 박스오피스 목록 -->
+  <select id="mainbo_list" resultType="MainBoxOfficeVO">
+    SELECT m.thumb, m.genre, m.showTm, m.watchGradeNm, m.director, m.actors, mc.rank, mc.movieCd, mc.movieNm, mc.openDt, mc.audiAcc
+    FROM movie m, boxOffice mc
+    WHERE mc.movieCd = m.movieCd
+    ORDER BY rank ASC
+  </select>
+  
+  
+  <!--  좋아요 생성 -->
+  <insert id="like_create" parameterType="HashMap">
+    INSERT INTO movielike(likeno, movieCd, memberno, like_check)
+    VALUES((SELECT NVL(MAX(likeno), 0)+1 as likeno FROM movielike), #{movieCd}, #{memberno}, 1)
+  </insert>
+  
+  <!--  좋아요 누름 -->
+  <update id="like_check"  parameterType="HashMap">
+    UPDATE movielike
+    SET like_check = 1
+    WHERE memberno = #{memberno} AND movieCd = #{movieCd}
+  </update>
+  
+  <!--  좋아요 취소 -->
+  <update id="like_check_cancel" parameterType="HashMap">
+    UPDATE movielike
+    SET like_check = 0
+    WHERE memberno = #{memberno} AND movieCd = #{movieCd}
+  </update>
+  
+  <!-- 좋아요 한 건 조회 -->
+  <select id="like_read" resultType="MovielikeVO" parameterType="HashMap">
+  SELECT likeno, movieCd, memberno, like_check
+  FROM movielike
+  WHERE memberno = #{memberno} AND movieCd = #{movieCd}
+  </select>
+  
+  <!-- 영화별 좋아요 갯수 -->
+  <select id="like_count" resultType="int" parameterType="String">
+    SELECT count(*)
+    FROM movielike
+    WHERE movieCd = #{movieCd} AND like_check = 1
+  </select>
+  
+  <!-- 회원의 영화별 좋아요 체크 확인 -->
+  <select id="a_like_count" resultType="int" parameterType="HashMap">
+    SELECT count(*)
+    FROM movielike
+    WHERE memberno = #{memberno} AND movieCd = #{movieCd}
+  </select>
+  
+  <!-- 회원별 보고싶어요 카운트 -->
+  <select id="mbc" resultType="int" parameterType="HashMap">
+    SELECT count(*)
+    FROM movie m, movielike ml
+    <choose>
+      <when test="word == null or word == ''"> <!-- 검색하지 않는 경우 -->
+      WHERE ml.like_check =1 AND m.movieCd =ml.movieCd AND ml.memberno = #{memberno}
+      </when>
+      <otherwise>
+       WHERE ml.like_check =1 AND m.movieCd =ml.movieCd AND ml.memberno = #{memberno} AND m.movieNm LIKE '%' || #{word} || '%'
+      </otherwise>
+    </choose>
+  </select>
+  
+  <!-- 회원별 보고싶어요 목록 -->
+  <select id="moviebucket" resultType="MoviebucketVO" parameterType="HashMap" >
+    SELECT movieNm, thumb, likeno, movieCd, r
+    FROM(
+             SELECT movieNm, thumb, likeno, movieCd, rownum as r
+             FROM(
+                      SELECT m.movieNm, m.thumb, m.movieCd, ml.likeno
+                      FROM movie m, movielike ml
+                      <choose>
+                        <when test="word == null or word == ''"> <!-- 검색하지 않는 경우 -->
+                        WHERE ml.like_check = 1  AND m.movieCd =ml.movieCd AND ml.memberno = #{memberno}
+                       </when>
+                      <otherwise>
+                        WHERE ml.like_check = 1  AND m.movieCd =ml.movieCd AND ml.memberno = #{memberno} AND m.movieNm LIKE '%' || #{word} || '%'
+                       </otherwise>
+                      </choose>
+                      ORDER BY ml.likeno DESC
+                    )
+       )
+       WHERE <![CDATA[ r >= #{startNum} AND r <= #{endNum} ]]><!--  태그를 단순 문자열로 처리 -->
+  </select>
+  
+    <!-- 회원의 영화 댓글 갯수 확인 -->
+  <select id="mc_check" resultType="int"  parameterType="HashMap">
+    SELECT count(*)
+    FROM mcomment
+    WHERE movieCd=(SELECT movieCd FROM movie WHERE movieCd=#{movieCd})  AND memberno = #{memberno}
+  </select>
+  
+  <!-- 영화별 영화평점 합 -->
+  <select id="grade_sum" resultType="int" parameterType="String">
+    SELECT sum(grade)
+    FROM mcomment
+    WHERE movieCd =(select movieCd from movie where movieCd=#{movieCd})
+  </select>
+   
+</mapper>

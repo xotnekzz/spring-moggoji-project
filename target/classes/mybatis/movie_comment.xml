@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mcomment">
+
+<!--  댓글 등록  -->
+<insert id="create" parameterType="McommentVO">
+  INSERT INTO mcomment(mcno, rdate, grade, content, movieCd, memberno, mname)
+  VALUES((SELECT NVL(MAX(mcno), 0)+1 as mcno FROM mcomment), sysdate, #{grade},
+            #{content}, #{movieCd}, #{memberno}, #{mname})
+</insert>
+
+<!--  댓글 리스트 -->
+<select id="list" resultType="McommentVO" parameterType="String">
+  SELECT mcno, rdate, grade, content, movieCd, memberno, mname
+  FROM mcomment
+  WHERE movieCd = #{movieCd}
+  ORDER BY mcno DESC
+
+</select>
+
+  <!-- 영화당 댓글 갯수 -->
+  <select id="mcc" resultType="int" parameterType="String">
+    SELECT count(*) as cnt
+    FROM mcomment
+    WHERE movieCd = #{movieCd}
+  </select>
+  
+  <!-- 회원별 영화 댓글 갯수 -->
+  <select id="m_mccount" resultType="int" parameterType="HashMap">
+    SELECT count(*) as cnt
+    FROM movie m, mcomment mc
+     <choose>
+      <when test="word == null or word == '' " > <!-- 검색하지 않는 경우 -->
+        WHERE m.movieCd = mc.movieCd AND memberno = #{memberno}
+      </when>
+      <otherwise>
+        WHERE m.movieCd = mc.movieCd AND memberno = #{memberno} AND movieNm LIKE '%' || #{word} || '%' 
+      </otherwise>
+    </choose>
+  </select>
+  
+<!--   <resultMap type="MovieNmVO" id="movieNmVO">
+    <result property="mcno" column="mcno"/>
+    <result property="rdate" column="rdate"/>
+    <result property="memberno" column="memberno"/>
+    <result property="content" column="content"/>
+    <result property="movieCd" column="movieCd"/>
+    <result property="grade" column="grade"/>
+    <result property="movieNm" column="movieNm"/>
+    <result property="thumb" column="thumb"/>
+  </resultMap> -->
+  
+  <!--  회원별 영화 댓글 목록+ 페이징+검색 -->
+  <select id="m_mclist" resultType="MovieNmVO" parameterType="HashMap">
+    SELECT mcno, movieCd, movieNm, content, grade, rdate, memberno, thumb, r
+    FROM(
+            SELECT  mcno, movieCd, movieNm, content, grade, rdate, memberno, thumb, rownum as r
+            FROM(
+                    SELECT mc.mcno, mc.movieCd, m.movieNm, mc.content, mc.grade, mc.rdate, mc.memberno, m.thumb
+                    FROM movie m, mcomment mc
+                  <choose>
+                    <when test="word == null or word == ''"> <!-- 검색하지 않는 경우 -->
+                    WHERE m.movieCd = mc.movieCd AND memberno = #{memberno}
+                   </when>
+                   <otherwise>
+                   WHERE m.movieCd = mc.movieCd AND memberno = #{memberno} AND m.movieNm LIKE '%' || #{word} || '%'  
+                   </otherwise>
+                </choose>
+               ORDER BY mc.mcno DESC
+          )
+    )
+     WHERE <![CDATA[ r >= #{startNum} AND r <= #{endNum} ]]><!--  태그를 단순 문자열로 처리 -->
+    <!-- WHERE r >= #{startNum} AND r <= #{endNum} -->
+  </select>
+  
+  <!-- 회원의 영화 댓글 삭제  -->
+  <delete id="delete" parameterType="HashMap">
+    DELETE FROM mcomment
+    WHERE movieCd=#{movieCd} AND memberno =#{memberno} AND mcno = ${mcno}
+  </delete>
+  
+  <!--  회원의 영화 댓글 한 건 조회 -->
+  <select id="read" resultType="MovieNmVO" parameterType="HashMap">
+    SELECT mc.mcno, mc.movieCd, m.movieNm, mc.grade, mc.content
+    FROM mcomment mc, movie m
+    WHERE m.movieCd = mc.movieCd AND mc.movieCd=#{movieCd} AND mc.memberno = #{memberno}
+  </select>
+  
+  <!--  회원의 영화 댓글 수정 -->
+  <update id="update" parameterType="HashMap">
+    UPDATE mcomment
+    SET grade=#{grade}, content=#{content}
+    WHERE movieCd=#{movieCd} AND memberno = #{memberno}
+  </update>
+  
+  <!-- 별점 총 갯수 -->
+  <select id="star_all_count" resultType="int">
+    SELECT COUNT(*) as cnt
+    FROM mcomment
+  </select>
+  
+</mapper>
